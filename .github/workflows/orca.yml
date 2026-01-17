@@ -3,12 +3,8 @@ name: orca
 on:
   workflow_call:
     inputs:
-      git_ref_key:
-        description: 'the name of the caller git ref variable, e.g., REF_COATJAVA'
-        required: true
-        type: string
-      git_ref_val:
-        description: 'the caller git ref itself, e.g., patch-1'
+      orca_ref:
+        description: 'the name of the git ref variable in orca, e.g., REF_COATJAVA'
         required: true
         type: string
       pipeline_timeout:
@@ -42,7 +38,6 @@ env:
   ORCA_ENDPOINT: https://code.jlab.org/api/v4/projects/${{ secrets.orca_project_id }}
   ORCA_PROJECT_TOKEN: ${{ secrets.orca_project_token }}
   ORCA_TRIGGER_TOKEN: ${{ secrets.orca_trigger_token }}
-  TIMEOUT: ${{ inputs.pipeline_timeout }}
   SLEEP_INTERVAL: 60 # duration between each pipeline-status check [s]
 
 jobs:
@@ -67,7 +62,7 @@ jobs:
             --form "variables[GITHUB_REPO]=${{ github.repository }}" \
             --form "variables[GITHUB_SHA]=${{ github.sha }}" \
             --form "variables[GITHUB_RUN_ID]=${{ github.run_id }}" \
-            --form "variables[REF_COATJAVA]=${{ github.head_ref || github.ref_name }}" \
+            --form "variables[${{ inputs.orca_ref }}]=${{ github.head_ref || github.ref_name }}" \
             "$ORCA_ENDPOINT/trigger/pipeline")
           echo "RESPONSE: $response"
           pipeline_id=$(echo $response | jq -r '.id')
@@ -90,9 +85,9 @@ jobs:
     steps:
       - name: wait for orca pipeline
         run: |
-          echo "Waiting for pipeline to complete ... checking every $TIMEOUT s ..."
+          echo "Waiting for pipeline to complete ... checking every ${{ inputs.pipeline_timeout }} s ..."
           elapsed=0
-          while [ $elapsed -lt $TIMEOUT ]; do
+          while [ $elapsed -lt ${{ inputs.pipeline_timeout }} ]; do
             response=$(curl \
               --silent --show-error --fail \
               --header "PRIVATE-TOKEN: $ORCA_PROJECT_TOKEN" \
