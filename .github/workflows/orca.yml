@@ -85,7 +85,9 @@ jobs:
     steps:
       - name: wait for orca pipeline
         run: |
-          echo "Waiting for pipeline to complete ... checking every ${{ inputs.pipeline_timeout }} s ..."
+          echo "Waiting for pipeline to complete ..."
+          echo "... pipeline status will be queried every $SLEEP_INTERVAL s"
+          echo "... pipeline will fail if time exceeds timeout ${{ inputs.pipeline_timeout }} s"
           elapsed=0
           while [ $elapsed -lt ${{ inputs.pipeline_timeout }} ]; do
             response=$(curl \
