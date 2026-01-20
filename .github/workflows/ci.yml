@@ -20,8 +20,13 @@ jobs:
       github.actor != 'dependabot[bot]')
     uses: JeffersonLab/acro/.github/workflows/orca.yml@main
     with:
-      # ref_var: REF_COATJAVA # controls which git ref variable gets set to the triggering ref
-      pipeline_timeout: 3600 # maximum time to allow the pipeline to run (seconds)
+      # ref_var controls which git ref variable gets set to the triggering ref;
+      # - see the variables named `REF_*` in https://code.jlab.org/hallb/clas12/orca/-/blob/main/.gitlab-ci.yml?ref_type=heads
+      # - for example, `REF_COATJAVA`
+      # - here we just use a non-existent `REF_*` variable "`REF_NOOP`" (`orca` will ignore it)
+      ref_var: REF_NOOP
+      # timeout is the maximum time to allow the pipeline to run (seconds)
+      pipeline_timeout: 3600
     secrets:
       orca_project_id: ${{ secrets.ORCA_PROJECT_ID }}
       orca_project_token: ${{ secrets.ORCA_PROJECT_TOKEN }}
