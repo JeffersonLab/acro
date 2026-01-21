@@ -7,6 +7,11 @@ on:
         description: 'the name of the git ref variable in orca, e.g., REF_COATJAVA'
         required: true
         type: string
+      ref_orca:
+        description: 'the git ref of orca itself'
+        required: false
+        type: string
+        default: main
       pipeline_timeout:
         description: 'maximum time to allow orca pipeline to run (seconds)'
         required: false
@@ -56,7 +61,7 @@ jobs:
             --silent --show-error --fail \
             --request POST \
             --form "token=$ORCA_TRIGGER_TOKEN" \
-            --form "ref=main" \
+            --form "ref=${{ inputs.ref_orca }}" \
             --form "variables[TRIGGERED_BY]=github" \
             --form "variables[GITHUB_EVENT]=${{ github.event_name }}" \
             --form "variables[GITHUB_REPO]=${{ github.repository }}" \
